@@ -21,8 +21,8 @@ namespace AsyncSample
         private static void TotallyAsync()
         {
             // Each loop will run in its own thread
-            var s = Run("Loop1");
-            var s2 = Run("Loop2");
+            var s = Run("Loop1", 100);
+            var s2 = Run("Loop2",300);
 
             // ... then print out the function result
             Console.WriteLine("End of " + s.Result);
@@ -35,8 +35,8 @@ namespace AsyncSample
         private static void SynchronizedAsync()
         {
             // Each loop will run in its own thread
-            var s = Run("Loop1");
-            var s2 = Run("Loop2");
+            var s = Run("Loop1",100);
+            var s2 = Run("Loop2",300);
 
             // Wait for both loops to finish 
             Task.WaitAll(s, s2);
@@ -46,12 +46,12 @@ namespace AsyncSample
             Console.WriteLine("End of " + s2.Result);
         }
 
-        private static async Task<string> Run(string pepe)
+        private static async Task<string> Run(string pepe, int iterations)
         {
             // Run the loop in background
             return await Task.Run(() =>
             {
-                for (var i = 0; i < 1500; i++)
+                for (var i = 0; i < iterations; i++)
                 {
                     Console.WriteLine("{0} - {1}", pepe, i);
                 }
