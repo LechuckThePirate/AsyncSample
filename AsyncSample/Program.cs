@@ -30,8 +30,13 @@ namespace AsyncSample
             Console.Clear();
             SynchronizedAsync();
             PressAnyKey();
+
+            // Test 4 : Continue with 
+            Console.Clear();
+            ContinueWith();
+            PressAnyKey();
         }
-        #endregion 
+        #endregion
 
         #region .: Tests :.
         // We run two loops the result will be 
@@ -51,27 +56,27 @@ namespace AsyncSample
             Console.WriteLine("End of {0}", s2);
             Console.WriteLine();
             Console.WriteLine("Loop2 should start right after finishing Loop1 and both End of Loop should be at bottom. "
-                                +"Scroll up to check it, and press any key for next test...");
+                                + "Scroll up to check it, and press any key for next test...");
         }
 
         // We run two loops the result will be
         // printed when each loop finishes independently
         private static void TotallyAsync()
         {
-            Console.WriteLine("Totally async loop. Each loop runs on its own "+
+            Console.WriteLine("Totally async loop. Each loop runs on its own " +
                 "thread and result is shown as soon as each thread ends...");
             PressAnyKey();
 
             // Each loop will run in its own thread
             var s1 = RunLoopAsync(LOOP1_NAME, SHORT_LOOP);
             var s2 = RunLoopAsync(LOOP2_NAME, LONG_LOOP);
-            
+
             // ... then print out the function result
             Console.WriteLine("End of {0}", s1.Result);
             Console.WriteLine("End of {0}", s2.Result);
             Console.WriteLine();
-            Console.WriteLine("Loop1 and Loop2 should be mixed, End of Loop1 should be somewhere in the "+
-                                    "middle and End of Loop2 at bottom. Scroll up to check it and press "+
+            Console.WriteLine("Loop1 and Loop2 should be mixed, End of Loop1 should be somewhere in the " +
+                                    "middle and End of Loop2 at bottom. Scroll up to check it and press " +
                                     "any key for next test...");
         }
 
@@ -79,7 +84,7 @@ namespace AsyncSample
         // printing the result of the functions
         private static void SynchronizedAsync()
         {
-            Console.WriteLine("Synchronized async loop. Each loop runs on its own thread, "+
+            Console.WriteLine("Synchronized async loop. Each loop runs on its own thread, " +
                 "but we wait until the end of both threads before showing the results...");
             PressAnyKey();
 
@@ -94,8 +99,28 @@ namespace AsyncSample
             Console.WriteLine("End of {0}", s1.Result);
             Console.WriteLine("End of {0}", s2.Result);
             Console.WriteLine();
-            Console.WriteLine("Loop1 and Loop2 should be mixed, but both End of Loop should "+
+            Console.WriteLine("Loop1 and Loop2 should be mixed, but both End of Loop should " +
                                     "be at the bottom. Scroll up to check it and press any key for next test...");
+        }
+
+        private static void ContinueWith()
+        {
+            Console.WriteLine("Continue with demo. Each loop runs on its own thread, " +
+                "but Loop2 will wait till Loop1 is finished to start ... Loop2 name will have " +
+                "Loop1 result concatenated...");
+            PressAnyKey();
+
+            var s1 = RunLoopAsync(LOOP1_NAME, SHORT_LOOP);
+            // This time Thread2 will wait for thread 1 to finish
+            var s2 = s1.ContinueWith(t => RunLoopAsync(string.Format("{0} - (from finished {1})", LOOP2_NAME, t.Result), LONG_LOOP));
+
+            // ... then print out the function result
+            Console.WriteLine("End of {0}", s1.Result);
+            Console.WriteLine("End of {0}", s2.Result.Result);
+            Console.WriteLine();
+            Console.WriteLine("Loop2 should start printing just after Loop1 finishes and their results are " +
+                                    "printed as soon as the loop is done, that is Loop1 somewhere in the middle and" +
+                                    "Loop2 at bottom. Scroll up to check it and press any key for next test...");
         }
 
         private static async Task<string> RunLoopAsync(string loopName, int iterations)
@@ -107,11 +132,11 @@ namespace AsyncSample
         private static string RunLoop(string loopName, int iterations)
         {
             var start = DateTime.Now;
-            for (var i = 0; i < iterations; i++)
+            for (var i = 1; i <= iterations; i++)
             {
                 Console.WriteLine("{0} - {1}", loopName, i);
             }
-            return string.Format(@"{0} ({1:mm\:ss\.fff})", loopName,DateTime.Now.Subtract(start));
+            return string.Format(@"{0} ({1:mm\:ss\.fff})", loopName, DateTime.Now.Subtract(start));
         }
         #endregion
 
