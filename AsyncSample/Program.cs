@@ -106,11 +106,12 @@ namespace AsyncSample
 
         private static string RunLoop(string loopName, int iterations)
         {
+            var start = DateTime.Now;
             for (var i = 0; i < iterations; i++)
             {
                 Console.WriteLine("{0} - {1}", loopName, i);
             }
-            return loopName;
+            return string.Format(@"{0} ({1:mm\:ss\.fff})", loopName,DateTime.Now.Subtract(start));
         }
         #endregion
 
